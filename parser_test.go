@@ -221,6 +221,36 @@ func TestParse(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func FuzzParse(f *testing.F) {
+	dirs, _ := xfile.ListDir(noterrorDir, xfile.TypeFile, -1)
+
+	for _, v := range dirs {
+		if v.Name == "README.md" {
+			continue
+		}
+
+		domain := strings.Split(v.Name, "_")[1]
+		extension := ""
+		if strings.Contains(v.Name, ".") {
+			extension = domain[strings.LastIndex(domain, ".")+1:]
+		}
+
+		if assert.IsContains([]string{"pre", "json"}, extension) {
+			continue
+		}
+
+		whoisRaw, err := xfile.ReadText(noterrorDir + "/" + v.Name)
+
+		if err == nil {
+			f.Add(whoisRaw)
+		}
+	}
+
+	f.Fuzz(func(t *testing.T, data string) {
+		_, _ = Parse(data)
+	})
+}
+
 func TestAssearchDomain(t *testing.T) {
 	tests := []struct {
 		whois     string

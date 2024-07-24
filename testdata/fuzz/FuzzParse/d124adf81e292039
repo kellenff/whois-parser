@@ -1,0 +1,2 @@
+go test fuzz v1
+string("domAin0.uA\n% Technical Contacts:\n0")
